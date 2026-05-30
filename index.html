@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OWL Agent Ecosystem</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#1a1a24;--border:#2a2a3a;
+  --text:#e8e8f0;--text2:#9898b0;--text3:#6868a0;
+  --accent:#7c6cf0;--accent2:#5b4fd0;--glow:rgba(124,108,240,.15);
+  --green:#4ade80;--cyan:#22d3ee;--amber:#fbbf24;--red:#f87171;--pink:#e879f9;
+  --radius:12px;--radius-sm:8px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+
+/*── Navigation ──*/
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,15,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+nav .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px}
+nav .logo{font-weight:700;font-size:1.1rem;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+nav .links{display:flex;gap:4px;list-style:none}
+nav .links a{color:var(--text2);text-decoration:none;padding:8px 16px;border-radius:var(--radius-sm);font-size:.9rem;transition:.2s}
+nav .links a:hover,nav .links a.active{color:var(--text);background:var(--bg3)}
+nav .links a.active{background:var(--glow);color:var(--accent)}
+
+/*── Hero ──*/
+.hero{min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(124,108,240,.08) 0%,transparent 70%);pointer-events:none}
+.hero h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.15;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,var(--text2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:1.1rem;color:var(--text2);max-width:560px;margin:0 auto 32px}
+.hero .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:var(--radius-sm);font-size:.95rem;font-weight:600;text-decoration:none;cursor:pointer;transition:.2s;border:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);box-shadow:0 0 32px rgba(124,108,240,.3)}
+.btn-ghost{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent)}
+
+/*── Section base ──*/
+section{padding:80px 24px}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-title{font-size:1.8rem;font-weight:700;margin-bottom:8px}
+.section-sub{color:var(--text2);margin-bottom:48px}
+
+/*── Agent Graph ──*/
+#agents{background:var(--bg)}
+.pipeline-tabs{display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap}
+.pipe-tab{padding:10px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;font-size:.85rem;font-weight:600;transition:.2s}
+.pipe-tab:hover{border-color:var(--accent);color:var(--text)}
+.pipe-tab.active{background:var(--glow);border-color:var(--accent);color:var(--accent)}
+.pipe-tab .count{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:10px;background:var(--bg3);font-size:.75rem}
+
+.graph-wrapper{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;min-height:600px}
+.graph-container{position:relative;width:100%;overflow:auto;min-height:600px}
+.graph-svg{min-width:900px;height:600px;display:block;cursor:grab}
+.graph-svg:active{cursor:grabbing}
+.node-group{cursor:pointer;transition:opacity .3s}
+.node-group.dimmed{opacity:.15}
+.node-group:hover,.node-group.focused{opacity:1}
+.node-rect{transition:all .3s;stroke-width:2}
+.node-group:hover .node-rect,.node-group.focused .node-rect{filter:brightness(1.3)}
+.node-label{font-size:11px;fill:var(--text);font-weight:600;pointer-events:none}
+.node-sublabel{font-size:9px;fill:var(--text2);pointer-events:none}
+.edge{fill:none;stroke-width:1.5;opacity:.4;transition:opacity .3s}
+.edge.highlighted{opacity:1;stroke-width:2.5}
+.node-rect{stroke:rgba(255,255,255,.1)}
+
+/* Agent detail panel */
+.detail-panel{position:absolute;right:16px;top:16px;width:340px;max-height:calc(100% - 32px);overflow-y:auto;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transform:translateX(calc(100% + 20px));transition:transform .3s;z-index:10}
+.detail-panel.open{transform:translateX(0)}
+.detail-panel .close{position:absolute;top:12px;right:12px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bg2);border:1px solid var(--border);cursor:pointer;color:var(--text2);font-size:14px}
+.detail-panel h3{font-size:1.1rem;margin-bottom:4px}
+.detail-panel .tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.detail-panel .desc{font-size:.85rem;color:var(--text2);margin-bottom:16px;line-height:1.5}
+.detail-panel h4{font-size:.75rem;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:8px}
+.conn-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.conn-list li{display:flex;align-items:center;gap:8px;font-size:.8rem;padding:6px 10px;background:var(--bg2);border-radius:var(--radius-sm);cursor:pointer;transition:.2s}
+.conn-list li:hover{background:var(--glow)}
+.conn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.conn-type{font-size:.65rem;color:var(--text3);margin-left:auto}
+
+/* Legend */
+.graph-legend{position:absolute;left:16px;bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;display:flex;gap:16px;flex-wrap:wrap;z-index:10}
+.leg{display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--text2)}
+.leg-line{width:24px;height:2px;border-radius:1px}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+
+/*── Projects ──*/
+#projects{background:var(--bg2)}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px}
+.project-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:.3s;display:flex;flex-direction:column}
+.project-card:hover{border-color:var(--accent);box-shadow:0 0 40px rgba(124,108,240,.08);transform:translateY(-2px)}
+.project-thumb{height:180px;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;overflow:hidden}
+.project-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 60%,var(--bg) 100%)}
+.project-body{padding:20px;flex:1;display:flex;flex-direction:column}
+.project-body h3{font-size:1.05rem;margin-bottom:8px}
+.project-body p{font-size:.85rem;color:var(--text2);flex:1}
+.project-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:10px;font-size:.7rem;font-weight:600;background:var(--bg2);color:var(--text2)}
+.chip.tech{background:rgba(124,108,240,.12);color:var(--accent)}
+.links{display:flex;gap:8px;margin-top:12px}
+.links a{font-size:.8rem;color:var(--text3);text-decoration:none;transition:.2s}
+.links a:hover{color:var(--accent)}
+
+/*── footer ──*/
+footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;border-top:1px solid var(--border)}
+
+/*── responsive ──*/
+@media(max-width:768px){
+  nav .links{display:none}
+  .graph-wrapper{min-height:500px}
+  .graph-svg{height:500px;min-width:700px}
+  .detail-panel{width:calc(100% - 32px);right:16px;left:16px;max-height:50vh;bottom:16px;top:auto;transform:translateY(calc(100% + 20px))}
+  .detail-panel.open{transform:translateY(0)}
+  .graph-legend{position:relative;left:auto;bottom:auto;margin-top:8px}
+  .projects-grid{grid-template-columns:1fr}
+}
+
+/* filter highlight for nodes */
+.node-group.filtered-out{display:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <span class="logo">🦉 OWL Ecosystem</span>
+    <ul class="links">
+      <li><a href="#agents" class="active" onclick="setNav(this)">Agents</a></li>
+      <li><a href="#projects" onclick="setNav(this)">Projects</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════ AGENTS PAGE ═══════════════ -->
+<section id="agents">
+<div class="section-inner">
+  <h2 class="section-title">Agent Architecture</h2>
+  <p class="section-sub">Click any agent node to see what it does and who it connects to. Drag to pan the graph.</p>
+
+  <div class="pipeline-tabs">
+    <div class="pipe-tab active" data-pipeline="all" onclick="filterPipeline('all')">All Pipelines <span class="count">36</span></div>
+    <div class="pipe-tab" data-pipeline="web" onclick="filterPipeline('web')">🌐 Web SDLC <span class="count">23</span></div>
+    <div class="pipe-tab" data-pipeline="flutter" onclick="filterPipeline('flutter')">📱 Flutter SDLC <span class="count">10</span></div>
+    <div class="pipe-tab" data-pipeline="core" onclick="filterPipeline('core')">⚡ Core / Shared <span class="count">3</span></div>
+  </div>
+
+  <div class="graph-wrapper">
+    <div class="graph-container" id="graphContainer">
+      <svg class="graph-svg" id="graphSvg" viewBox="0 0 960 620" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reuse"><polygon points="0 0, 10 3.5, 0 7" fill="#4a4a6a"/></marker>
+          <marker id="arrow-hi" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reuse"><polygon points="0 0, 10 3.5, 0 7" fill="#7c6cf0"/></marker>
+          <filter id="glow"><feGaussianBlur stdDeviation="3" result="g"/><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <g id="edgesLayer"></g>
+        <g id="nodesLayer"></g>
+      </svg>
+    </div>
+
+    <div class="graph-legend">
+      <div class="leg"><span class="leg-dot" style="background:#7c6cf0"></span>Orchestrator</div>
+      <div class="leg"><span class="leg-dot" style="background:#22d3ee"></span>Web Agent</div>
+      <div class="leg"><span class="leg-dot" style="background:#4ade80"></span>Flutter Agent</div>
+      <div class="leg"><span class="leg-dot" style="background:#fbbf24"></span>Shared</div>
+      <div class="leg"><span class="leg-line" style="background:#4a4a6a"></span>Data / Dispatch</div>
+      <div class="leg"><span class="leg-line" style="background:#e879f9"></span>Review Flow</div>
+    </div>
+
+    <div class="detail-panel" id="detailPanel">
+      <button class="close" onclick="closePanel()">✕</button>
+      <h3 id="dpTitle"></h3>
+      <span class="tag" id="dpTag"></span>
+      <div class="desc" id="dpDesc"></div>
+      <div id="dpPhase"></div>
+      <h4>Connects To</h4>
+      <ul class="conn-list" id="dpConns"></ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════ PROJECTS PAGE ═══════════════ -->
+<section id="projects">
+<div class="section-inner">
+  <h2 class="section-title">Projects</h2>
+  <p class="section-sub">Applications built through the agent pipelines</p>
+  <div class="projects-grid">
+
+    <div class="project-card">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
+        <div>📸</div>
+      </div>
+      <div class="project-body">
+        <h3>StudioShia Photo Studio</h3>
+        <p>Japanese Muji-style self-shoot photo studio website with real-time booking system, 4 packages, 30-min slot intervals, double-booking prevention, and admin dashboard with payment verification.</p>
+        <div class="project-meta">
+          <span class="chip tech">Next.js 15</span>
+          <span class="chip tech">Supabase</span>
+          <span class="chip tech">shadcn/ui</span>
+          <span class="chip">Web SDLC v4</span>
+          <span class="chip">48 files</span>
+        </div>
+        <div class="links">
+          <a href="https://github.com/exor312/photo-studio" target="_blank">GitHub →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#0f172a,#1e293b)">
+        <div>📋</div>
+      </div>
+      <div class="project-body">
+        <h3>Resume Website</h3>
+        <p>Interactive portfolio with full-view project modals, day/night theme toggle, Impact & Results stats per project, keyboard navigation, and smooth animations.</p>
+        <div class="project-meta">
+          <span class="chip tech">Next.js</span>
+          <span class="chip tech">Vercel</span>
+          <span class="chip">Web SDLC</span>
+        </div>
+        <div class="links">
+          <a href="https://resume-website-ten-orpin.vercel.app" target="_blank">Live Site →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#0c1445,#1a237e)">
+        <div>🎮</div>
+      </div>
+      <div class="project-body">
+        <h3>Mini Games <span style="color:var(--text3);font-weight:400">v1.1.2</span></h3>
+        <p>Educational Flutter mini-games app with Math game (10-question rounds, XP system, completion tracking), home navigation, and extensible subject architecture.</p>
+        <div class="project-meta">
+          <span class="chip tech">Flutter</span>
+          <span class="chip tech">Dart 3</span>
+          <span class="chip">Flutter SDLC</span>
+          <span class="chip">5 subjects</span>
+        </div>
+        <div class="links">
+          <a href="https://github.com/exor312/mini-games-app" target="_blank">GitHub →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#1a0a2e,#2d1b69)">
+        <div>👶</div>
+      </div>
+      <div class="project-body">
+        <h3>ToddlerSpeak <span style="color:var(--text3);font-weight:400">v1.0.1</span></h3>
+        <p>Language learning app for ages 1–2 with Core Data persistence, visual flashcards, audio playback, progress tracking, and parental dashboard.</p>
+        <div class="project-meta">
+          <span class="chip tech">Flutter</span>
+          <span class="chip tech">Core Data</span>
+          <span class="chip">Flutter SDLC</span>
+        </div>
+        <div class="links">
+          <a href="https://github.com/exor312/toddler-speak-app" target="_blank">GitHub →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#0a1628,#0d2137)">
+        <div>💰</div>
+      </div>
+      <div class="project-body">
+        <h3>Budget Tracker</h3>
+        <p>Personal finance Flutter app with transaction management (cash, debit, credit, loan, stocks), date/time tracking, dark mode, statistical graphs, and account type categorization.</p>
+        <div class="project-meta">
+          <span class="chip tech">Flutter</span>
+          <span class="chip tech">fl_chart</span>
+          <span class="chip">Flutter SDLC</span>
+        </div>
+        <div class="links">
+          <a href="https://github.com/exor312/" target="_blank">GitHub →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<footer>
+  Built by OWL · exor312 · 2026
+</footer>
+
+<script>
+// ═══════════════════ AGENT DATA ═══════════════════
+const agents = {
+  // ── Shared / Core ──
+  hermes: {id:'hermes',label:'Hermes\nGateway',sub:'Channel Router',pipeline:'core',color:'#fbbf24',phase:0,
+    desc:'The central Hermes agent. Receives all user messages, routes to the correct pipeline profile (Flutter SDLC, Web SDLC, or General). Manages memory, skills, Obsidian vault updates, and GitHub backup cron jobs.',
+    conns:[
+      {target:'orch-web',type:'dispatch',label:'Web tasks →'},
+      {target:'orch-flutter',type:'dispatch',label:'Flutter tasks →'},
+      {target:'obsidian',type:'write',label:'Vault updates'},
+      {target:'github-shared',type:'push',label:'Code commits'}
+    ]},
+  obsidian: {id:'obsidian',label:'Obsidian\nVault',sub:'Documentation',pipeline:'core',color:'#fbbf24',phase:0,
+    desc:'Auto-updates the Obsidian vault after every session with task summaries, [[wikilinks]] for cross-referencing, and project documentation. Maintains the Session Log and project notes.',
+    conns:[]},
+  'github-shared': {id:'github-shared',label:'GitHub\nBackup',sub:'Auto-backup',pipeline:'core',color:'#fbbf24',phase:0,
+    desc:'Daily 2 AM cron job that backs up all Hermes profiles, skills, memories, and config to the private exor312/hermes-agent-backup repository.',
+    conns:[]},
+
+  // ── Web SDLC Orchestrator ──
+  'orch-web': {id:'orch-web',label:'Orchestrator',sub:'Web SDLC',pipeline:'web',color:'#7c6cf0',phase:0,
+    desc:'The sole agent with hands in the Web pipeline. Reads/writes files, calls all 22 sub-agents, manages project.json state machine. User only talks to this agent directly. All other web agents are invisible.',
+    conns:[
+      {target:'prd-web',type:'dispatch',label:'Phase 1: PRD'},
+      {target:'arch-web',type:'dispatch',label:'Phase 2: Architect'},
+      {target:'supa-web',type:'dispatch',label:'Phase 2.5: Provision'},
+      {target:'uiux-web',type:'dispatch',label:'Phase 3: UI/UX'},
+      {target:'ticket-web',type:'dispatch',label:'Phase 4: Tickets'},
+      {target:'test-web',type:'dispatch',label:'Phase 7: Tests'},
+      {target:'build-web',type:'dispatch',label:'Phase 8: Build'},
+      {target:'change-web',type:'dispatch',label:'Phase 9: Changes'}
+    ]},
+  'prd-web': {id:'prd-web',label:'PRD\nAgent',sub:'Requirements',pipeline:'web',color:'#22d3ee',phase:1,
+    desc:'Interviews the user to capture project requirements. Produces structured PRD with pages, features, entities, integrations, and design tone. Output feeds into Architect agent.',
+    conns:[
+      {target:'arch-web',type:'output',label:'PRD → Architect'},
+      {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
+    ]},
+  'arch-web': {id:'arch-web',label:'Architect\nAgent',sub:'Blueprint',pipeline:'web',color:'#22d3ee',phase:2,
+    desc:'Makes all tech decisions via 6 decision trees (DT-1 through DT-6): API strategy, state management, auth, database, rendering, integrations. Produces complete project blueprint.',
+    conns:[
+      {target:'supa-web',type:'output',label:'Architecture →'},
+      {target:'uiux-web',type:'output',label:'Component map →'},
+      {target:'ticket-web',type:'output',label:'Architecture →'},
+      {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
+    ]},
+  'supa-web': {id:'supa-web',label:'Supabase\nProvisioner',sub:'DB + Auth',pipeline:'web',color:'#22d3ee',phase:2.5,
+    desc:'Finds or creates Supabase project via Management API. Sets up DB, auth, API keys, live schema capture. Always runs findproject first to avoid duplicates. CONDITIONAL: skipped for static sites.',
+    conns:[
+      {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
+    ]},
+  'uiux-web': {id:'uiux-web',label:'UI/UX\nAgent',sub:'Design System',pipeline:'web',color:'#22d3ee',phase:3,
+    desc:'Defines full design system: color palette, typography, spacing, component specs, animations, CSS variables. Tone derived from PRD. Output feeds into Config, Frontend, and Component coders.',
+    conns:[
+      {target:'coders-web',type:'output',label:'Design tokens →'},
+      {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
+    ]},
+  'ticket-web': {id:'ticket-web',label:'Ticket\nAgent',sub:'Dependency Graph',pipeline:'web',color:'#22d3ee',phase:4,
+    desc:'Breaks architecture into atomic tickets with dependency graph. Groups: Foundation → Supabase → Middleware → Auth → Layouts → Actions → API Routes → Integrations → Components → Pages → Deploy.',
+    conns:[
+      {target:'coders-web',type:'output',label:'Tickets → Coders'},
+      {target:'reviewers-web',type:'output',label:'Tickets → Reviewers'}
+    ]},
+  'coders-web': {id:'coders-web',label:'Coder\nAgents',sub:'代码 × 6 types',pipeline:'web',color:'#22d3ee',phase:5,
+    desc:'Parallel coder group: DB Coder (SQL migrations), Backend Coder (server actions, API routes), Frontend Coder (pages), Component Coder (UI components), Config Coder (next.config, tailwind), Integration Coder (third-party APIs), Vercel Coder (deployment config).',
+    conns:[
+      {target:'reviewers-web',type:'review',label:'Code → Review (pink)'},
+      {target:'orch-web',type:'report',label:'PASS / FAIL'}
+    ]},
+  'reviewers-web': {id:'reviewers-web',label:'Review\nAgents',sub:'Quality × 6 types',pipeline:'web',color:'#e879f9',phase:6,
+    desc:'Parallel reviewer group matching each coder type. DB Review (RLS, idempotent SQL, schema match), Backend Review (security, server guards), Frontend Review (imports, Tailwind, a11y), Component Review, Config Review, Integration Review (API key exposure, DOCS_REQUIRED flow).',
+    conns:[
+      {target:'coders-web',type:'feedback',label:'FAIL → Retry coder'},
+      {target:'orch-web',type:'report',label:'PASS / FAIL'}
+    ]},
+  'test-web': {id:'test-web',label:'Test\nAgent',sub:'Test Suite',pipeline:'web',color:'#22d3ee',phase:7,
+    desc:'Generates test suite covering all feature tickets. Auto-generated → advance to Build. CONDITIONAL: may be skipped for static sites.',
+    conns:[
+      {target:'build-web',type:'output',label:'Tests → Build'}
+    ]},
+  'build-web': {id:'build-web',label:'Build\nAgent',sub:'Package + Ship',pipeline:'web',color:'#22d3ee',phase:8,
+    desc:'Audits dependencies, generates package.json/README/.gitignore, creates GitHub repo, pushes all code. HARD GATE: user APPROVE required before any files are committed.',
+    conns:[
+      {target:'github-shared',type:'push',label:'Push to GitHub'},
+      {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
+    ]},
+  'change-web': {id:'change-web',label:'Change\nAgent',sub:'Post-ship edits',pipeline:'web',color:'#22d3ee',phase:9,
+    desc:'Handles post-delivery change requests. Classifies change type (visual, schema, logic, feature, bug fix, config). Produces surgical change plan → APPROVE → execute.',
+    conns:[
+      {target:'coders-web',type:'output',label:'Change → Coder'},
+      {target:'orch-web',type:'report',label:'Change plan → APPROVE'}
+    ]},
+
+  // ── Flutter SDLC Orchestrator ──
+  'orch-flutter': {id:'orch-flutter',label:'Orchestrator',sub:'Flutter SDLC',pipeline:'flutter',color:'#7c6cf0',phase:0,
+    desc:'State machine-driven orchestrator for Flutter projects. Manages IDEA → PRD → ARCH → TICKETS → CODE → REVIEW → TEST → BUILD → NEVER dispatches two agents simultaneously. One action per invocation, always JSON output.',
+    conns:[
+      {target:'prd-flutter',type:'dispatch',label:'IDEA: PRD Agent'},
+      {target:'arch-flutter',type:'dispatch',label:'PRD✓: Architect'},
+      {target:'ticket-flutter',type:'dispatch',label:'ARCH✓: Tickets'},
+      {target:'coders-flutter',type:'dispatch',label:'TICKETS✓: Code loop'},
+      {target:'test-flutter',type:'dispatch',label:'CODE✓: Tests'},
+      {target:'build-flutter',type:'dispatch',label:'TEST✓: Build'}
+    ]},
+  'prd-flutter': {id:'prd-flutter',label:'PRD\nAgent',sub:'Requirements',pipeline:'flutter',color:'#4ade80',phase:1,
+    desc:'Captures Flutter app requirements via structured interview. Covers screens, features, user flows, entities, integrations, design references, and out-of-scope items.',
+    conns:[
+      {target:'arch-flutter',type:'output',label:'PRD → Architect'},
+      {target:'orch-flutter',type:'report',label:'Checkpoint: APPROVE'}
+    ]},
+  'arch-flutter': {id:'arch-flutter',label:'Architect\nAgent',sub:'Flutter Stack',pipeline:'flutter',color:'#4ade80',phase:2,
+    desc:'Decides Flutter architecture: state management (Provider/Riverpod/Bloc), navigation (go_router), folder structure, key packages, theming strategy. Produces complete project blueprint.',
+    conns:[
+      {target:'ticket-flutter',type:'output',label:'Arch → Tickets'},
+      {target:'orch-flutter',type:'report',label:'Checkpoint: APPROVE'}
+    ]},
+  'ticket-flutter': {id:'ticket-flutter',label:'Ticket\nAgent',sub:'Task Breakdown',pipeline:'flutter',color:'#4ade80',phase:3,
+    desc:'Generates sequenced development tickets from architecture. Each ticket maps to one file/widget. Tracks dependency ordering and parallelization opportunities.',
+    conns:[
+      {target:'coders-flutter',type:'output',label:'Tickets → Coder/Review'}
+    ]},
+  'coders-flutter': {id:'coders-flutter',label:'Coder Agent',sub:'Flutter Code',pipeline:'flutter',color:'#4ade80',phase:4,
+    desc:'Writes Flutter/Dart code for each ticket. Handles models, screens, widgets, services, state management. Checks existing files first to avoid overwriting working code. Validates with flutter analyze before marking done.',
+    conns:[
+      {target:'review-flutter',type:'review',label:'Code → Review (pink)'},
+      {target:'orch-flutter',type:'report',label:'Output → Orchestrator'}
+    ]},
+  'review-flutter': {id:'review-flutter',label:'Review\nAgent',sub:'Code Quality',pipeline:'flutter',color:'#e879f9',phase:5,
+    desc:'Reviews generated Flutter code against checklist: no analyzer errors, proper state management patterns, null safety, dependency injection, test compatibility. Returns PASS/FAIL with correction instructions.',
+    conns:[
+      {target:'coders-flutter',type:'feedback',label:'FAIL → Retry coder'},
+      {target:'orch-flutter',type:'report',label:'PASS / FAIL'}
+    ]},
+  'test-flutter': {id:'test-flutter',label:'Test\nAgent',sub:'Flutter Tests',pipeline:'flutter',color:'#4ade80',phase:6,
+    desc:'Generates widget tests and unit tests for each ticket. Handles provider mocking, SharedPreferences initialization, binding setup. Ensures all tests pass before BUILD phase.',
+    conns:[
+      {target:'build-flutter',type:'output',label:'Tests → Build'},
+      {target:'orch-flutter',type:'report',label:'All passed → advance'}
+    ]},
+  'build-flutter': {id:'build-flutter',label:'Build\nAgent',sub:'APK + Release',pipeline:'flutter',color:'#4ade80',phase:7,
+    desc:'Builds release APK, creates GitHub release with APK attachment and git tag. Full SDLC mandate: Review → Test → Build → Release. No exceptions — never says "done" without completing all four phases.',
+    conns:[
+      {target:'github-shared',type:'release',label:'GitHub Release + Tag'},
+      {target:'orch-flutter',type:'report',label:'APK ready → DONE'}
+    ]},
+};
+
+// ═══════════════════ LAYOUT ═══════════════════
+const layout = {
+  // Row 0: Hermes at top center
+  hermes: {x:480,y:50,w:120,h:56},
+  // Row 1: Three orchestrators
+  'orch-web':    {x:660,y:160,w:120,h:56},
+  'orch-flutter':{x:300,y:160,w:120,h:56},
+  // Row 2: Phase agents
+  'prd-web':     {x:550,y:270,w:100,h:48},
+  'arch-web':    {x:670,y:270,w:100,h:48},
+  'supa-web':    {x:790,y:270,w:100,h:48},
+  'uiux-web':    {x:670,y:340,w:100,h:48},
+  'ticket-web':  {x:790,y:340,w:100,h:48},
+  'prd-flutter': {x:180,y:270,w:100,h:48},
+  'arch-flutter':{x:300,y:270,w:100,h:48},
+  'ticket-flutter':{x:420,y:270,w:100,h:48},
+  // Row 3: Coders + Reviewers
+  'coders-web':   {x:580,y:430,w:120,h:48},
+  'reviewers-web':{x:740,y:430,w:120,h:48},
+  'coders-flutter':  {x:240,y:400,w:120,h:48},
+  'review-flutter':  {x:380,y:400,w:120,h:48},
+  // Row 4: Test, Build, Change
+  'test-web':    {x:520,y:520,w:100,h:48},
+  'build-web':   {x:640,y:520,w:100,h:48},
+  'change-web': {x:760,y:520,w:100,h:48},
+  'test-flutter':  {x:180,y:500,w:100,h:48},
+  'build-flutter': {x:300,y:500,w:100,h:48},
+  // Shared services at bottom
+  'obsidian':     {x:80,y:460,w:100,h:48},
+  'github-shared':{x:80,y:530,w:100,h:48},
+};
+
+let activePipeline = 'all';
+let focusedNode = null;
+
+function renderGraph(){
+  const svg = document.getElementById('graphSvg');
+  const edgesLayer = document.getElementById('edgesLayer');
+  const nodesLayer = document.getElementById('nodesLayer');
+  edgesLayer.innerHTML = '';
+  nodesLayer.innerHTML = '';
+
+  const filtered = activePipeline === 'all'
+    ? Object.keys(agents)
+    : Object.keys(agents).filter(id => agents[id].pipeline === activePipeline);
+
+  // Draw edges
+  for(const id of filtered){
+    const agent = agents[id];
+    const pos = layout[id];
+    if(!pos) continue;
+    const ax = pos.x + pos.w/2, ay = pos.y + pos.h/2;
+    for(const conn of agent.conns){
+      const tPos = layout[conn.target];
+      if(!tPos) continue;
+      if(activePipeline !== 'all' && !filtered.includes(conn.target)) continue;
+      const bx = tPos.x + tPos.w/2, by = tPos.y + tPos.h/2;
+      const isReview = conn.type === 'review';
+      const isHighlighted = focusedNode && (id === focusedNode || conn.target === focusedNode);
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      const dx = bx - ax, dy = by - ay;
+      const cx = (ax+bx)/2 + (isReview ? dy*.15 : -dy*.1);
+      const cy = (ay+by)/2 + (isReview ? -dx*.1 : dx*.08);
+      path.setAttribute('d',`M${ax},${ay} Q${cx},${cy} ${bx},${by}`);
+      path.setAttribute('class',`edge${isHighlighted?' highlighted':''}`);
+      path.setAttribute('stroke',isReview?'#e879f9':'#4a4a6a');
+      path.setAttribute('stroke-opacity',isReview?'0.5':'0.35');
+      path.setAttribute('marker-end',isHighlighted?'url(#arrow-hi)':'url(#arrow)');
+      if(isHighlighted) path.setAttribute('stroke-width','2.5');
+      edgesLayer.appendChild(path);
+    }
+  }
+
+  // Draw nodes
+  for(const id of filtered){
+    const agent = agents[id];
+    const pos = layout[id];
+    if(!pos) continue;
+    let dimmed = focusedNode && focusedNode !== id;
+    // Check if connected to focused
+    if(focusedNode && focusedNode !== id){
+      const fConns = agents[focusedNode]?.conns.map(c=>c.target) || [];
+      if(!fConns.includes(id) && !agents[id]?.conns.map(c=>c.target).includes(focusedNode)) dimmed = true;
+      else dimmed = false;
+    }
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class',`node-group${dimmed?' dimmed':''}${focusedNode===id?' focused':''}`);
+    g.setAttribute('data-id',id);
+    g.onclick = (e)=>{ e.stopPropagation(); showDetail(id); };
+
+    const rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',pos.x); rect.setAttribute('y',pos.y);
+    rect.setAttribute('width',pos.w); rect.setAttribute('height',pos.h);
+    rect.setAttribute('rx',8); rect.setAttribute('ry',8);
+    rect.setAttribute('class','node-rect');
+    rect.setAttribute('fill',agent.color+'15');
+    rect.setAttribute('stroke',agent.color+'80');
+    if(focusedNode===id) rect.setAttribute('filter','url(#glow)');
+    g.appendChild(rect);
+
+    // Label lines
+    const lines = agent.label.split('\n');
+    const cy = pos.y + pos.h/2 - ((lines.length-1)*7);
+    for(let i=0;i<lines.length;i++){
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',pos.x+pos.w/2);
+      t.setAttribute('y',cy + i*14);
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('class','node-label');
+      t.textContent = lines[i];
+      g.appendChild(t);
+    }
+    if(agent.sub){
+      const s = document.createElementNS('http://www.w3.org/2000/svg','text');
+      s.setAttribute('x',pos.x+pos.w/2);
+      s.setAttribute('y',pos.y+pos.h-6);
+      s.setAttribute('text-anchor','middle');
+      s.setAttribute('class','node-sublabel');
+      s.textContent = agent.sub;
+      g.appendChild(s);
+    }
+    nodesLayer.appendChild(g);
+  }
+}
+
+function showDetail(id){
+  const a = agents[id];
+  if(!a) return;
+  focusedNode = id;
+  renderGraph();
+  document.getElementById('dpTitle').textContent = a.label.replace('\n',' ');
+  const tag = document.getElementById('dpTag');
+  tag.textContent = a.pipeline === 'web' ? 'Web SDLC' : a.pipeline === 'flutter' ? 'Flutter SDLC' : 'Core Service';
+  tag.style.background = a.color+'25';
+  tag.style.color = a.color;
+  document.getElementById('dpDesc').textContent = a.desc;
+  document.getElementById('dpPhase').innerHTML = `<h4>Phase ${a.phase}</h4>`;
+  const connUl = document.getElementById('dpConns');
+  connUl.innerHTML = '';
+  for(const c of a.conns){
+    const t = agents[c.target];
+    if(!t) continue;
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="conn-dot" style="background:${t.color}"></span><span>${t.label.replace('\n',' ')}</span><span class="conn-type">${c.type}</span>`;
+    li.onclick = ()=>{ showDetail(c.target); };
+    connUl.appendChild(li);
+  }
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function closePanel(){
+  focusedNode = null;
+  renderGraph();
+  document.getElementById('detailPanel').classList.remove('open');
+}
+
+function filterPipeline(p){
+  activePipeline = p;
+  focusedNode = null;
+  document.getElementById('detailPanel').classList.remove('open');
+  document.querySelectorAll('.pipe-tab').forEach(t=>t.classList.toggle('active', t.dataset.pipeline===p));
+  renderGraph();
+}
+
+// ═══════════════════ PAN + ZOOM ═══════════════════
+const container = document.getElementById('graphContainer');
+let isPanning = false, startX, startY, scrollL, scrollT;
+container.addEventListener('mousedown',(e)=>{
+  if(e.target.closest('.node-group')) return;
+  isPanning=true; startX=e.pageX; startY=e.pageY;
+  scrollL=container.scrollLeft; scrollT=container.scrollTop;
+  container.style.cursor='grabbing';
+});
+document.addEventListener('mousemove',e=>{if(!isPanning)return;container.scrollLeft=scrollL-(e.pageX-startX);container.scrollTop=scrollT-(e.pageY-startY);});
+document.addEventListener('mouseup',()=>{isPanning=false;container.style.cursor='grab';});
+
+// click on blank area to deselect
+container.addEventListener('click',e=>{
+  if(e.target===container||e.target.classList.contains('graph-svg')){ closePanel(); }
+});
+
+// ═══════════════════ NAVIGATION ═══════════════════
+function setNav(el){
+  document.querySelectorAll('.links a').forEach(a=>a.classList.remove('active'));
+  el.classList.add('active');
+}
+window.addEventListener('scroll',()=>{
+  const y = window.scrollY + 80;
+  const agentsTop = document.getElementById('agents').offsetTop;
+  const projectsTop = document.getElementById('projects').offsetTop;
+  document.querySelectorAll('.links a').forEach(a=>a.classList.remove('active'));
+  if(y >= projectsTop) document.querySelectorAll('.links a')[1].classList.add('active');
+  else document.querySelectorAll('.links a')[0].classList.add('active');
+});
+
+// ═══════════════════ INIT ═══════════════════
+renderGraph();
+</script>
+</body>
+</html>
