@@ -11,6 +11,7 @@
   --text:#e8e8f0;--text2:#9898b0;--text3:#6868a0;
   --accent:#7c6cf0;--accent2:#5b4fd0;--glow:rgba(124,108,240,.15);
   --green:#4ade80;--cyan:#22d3ee;--amber:#fbbf24;--red:#f87171;--pink:#e879f9;
+  --orange:#fb923c;--teal:#2dd4bf;
   --radius:12px;--radius-sm:8px;
 }
 html{scroll-behavior:smooth}
@@ -43,6 +44,12 @@ section{padding:80px 24px}
 .section-title{font-size:1.8rem;font-weight:700;margin-bottom:8px}
 .section-sub{color:var(--text2);margin-bottom:48px}
 
+/*── Stats bar ──*/
+.stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:48px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center}
+.stat-card .num{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-card .label{font-size:.8rem;color:var(--text2);margin-top:4px}
+
 /*── Agent Graph ──*/
 #agents{background:var(--bg)}
 .pipeline-tabs{display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap}
@@ -51,9 +58,9 @@ section{padding:80px 24px}
 .pipe-tab.active{background:var(--glow);border-color:var(--accent);color:var(--accent)}
 .pipe-tab .count{display:inline-block;margin-left:6px;padding:2px 7px;border-radius:10px;background:var(--bg3);font-size:.75rem}
 
-.graph-wrapper{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;min-height:600px}
-.graph-container{position:relative;width:100%;overflow:auto;min-height:600px}
-.graph-svg{min-width:900px;height:600px;display:block;cursor:grab}
+.graph-wrapper{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;min-height:700px}
+.graph-container{position:relative;width:100%;overflow:auto;min-height:700px}
+.graph-svg{min-width:1000px;height:700px;display:block;cursor:grab}
 .graph-svg:active{cursor:grabbing}
 .node-group{cursor:pointer;transition:opacity .3s}
 .node-group.dimmed{opacity:.15}
@@ -103,6 +110,18 @@ section{padding:80px 24px}
 .links a{font-size:.8rem;color:var(--text3);text-decoration:none;transition:.2s}
 .links a:hover{color:var(--accent)}
 
+/*── Infrastructure ──*/
+#infrastructure{background:var(--bg)}
+.infra-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.infra-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.infra-card h3{font-size:1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.infra-card h3 .icon{font-size:1.2rem}
+.infra-card ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.infra-card li{font-size:.85rem;color:var(--text2);display:flex;align-items:flex-start;gap:8px}
+.infra-card li::before{content:'›';color:var(--accent);font-weight:700}
+.infra-card .status{display:inline-block;width:8px;height:8-radius:50%;background:var(--green);margin-right:6px;flex-shrink:0}
+.infra-card .status.amber{background:var(--amber)}
+
 /*── footer ──*/
 footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;border-top:1px solid var(--border)}
 
@@ -115,6 +134,8 @@ footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;bo
   .detail-panel.open{transform:translateY(0)}
   .graph-legend{position:relative;left:auto;bottom:auto;margin-top:8px}
   .projects-grid{grid-template-columns:1fr}
+  .infra-grid{grid-template-columns:1fr}
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
 }
 
 /* filter highlight for nodes */
@@ -128,6 +149,7 @@ footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;bo
     <span class="logo">🦉 OWL Ecosystem</span>
     <ul class="links">
       <li><a href="#agents" class="active" onclick="setNav(this)">Agents</a></li>
+      <li><a href="#infrastructure" onclick="setNav(this)">Infrastructure</a></li>
       <li><a href="#projects" onclick="setNav(this)">Projects</a></li>
     </ul>
   </div>
@@ -137,18 +159,38 @@ footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;bo
 <section id="agents">
 <div class="section-inner">
   <h2 class="section-title">Agent Architecture</h2>
-  <p class="section-sub">Click any agent node to see what it does and who it connects to. Drag to pan the graph.</p>
+  <p class="section-sub">OWL is the Master Orchestrator — receives missions from Shin, delegates to specialist agents. Click any node for details.</p>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="num">38</div>
+      <div class="label">Total Agents</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">4</div>
+      <div class="label">Discord Bots</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">3</div>
+      <div class="label">Active Pipelines</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">3</div>
+      <div class="label">Web Projects</div>
+    </div>
+  </div>
 
   <div class="pipeline-tabs">
-    <div class="pipe-tab active" data-pipeline="all" onclick="filterPipeline('all')">All Pipelines <span class="count">36</span></div>
+    <div class="pipe-tab active" data-pipeline="all" onclick="filterPipeline('all')">All <span class="count">38</span></div>
+    <div class="pipe-tab" data-pipeline="core" onclick="filterPipeline('core')">🦉 OWL / Core <span class="count">4</span></div>
     <div class="pipe-tab" data-pipeline="web" onclick="filterPipeline('web')">🌐 Web SDLC <span class="count">23</span></div>
     <div class="pipe-tab" data-pipeline="flutter" onclick="filterPipeline('flutter')">📱 Flutter SDLC <span class="count">10</span></div>
-    <div class="pipe-tab" data-pipeline="core" onclick="filterPipeline('core')">⚡ Core / Shared <span class="count">3</span></div>
+    <div class="pipe-tab" data-pipeline="trading" onclick="filterPipeline('trading')">📈 Trading <span class="count">1</span></div>
   </div>
 
   <div class="graph-wrapper">
     <div class="graph-container" id="graphContainer">
-      <svg class="graph-svg" id="graphSvg" viewBox="0 0 960 620" xmlns="http://www.w3.org/2000/svg">
+      <svg class="graph-svg" id="graphSvg" viewBox="0 0 1060 720" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reuse"><polygon points="0 0, 10 3.5, 0 7" fill="#4a4a6a"/></marker>
           <marker id="arrow-hi" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reuse"><polygon points="0 0, 10 3.5, 0 7" fill="#7c6cf0"/></marker>
@@ -160,10 +202,11 @@ footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;bo
     </div>
 
     <div class="graph-legend">
-      <div class="leg"><span class="leg-dot" style="background:#7c6cf0"></span>Orchestrator</div>
+      <div class="leg"><span class="leg-dot" style="background:#fbbf24"></span>Orchestrator</div>
       <div class="leg"><span class="leg-dot" style="background:#22d3ee"></span>Web Agent</div>
       <div class="leg"><span class="leg-dot" style="background:#4ade80"></span>Flutter Agent</div>
-      <div class="leg"><span class="leg-dot" style="background:#fbbf24"></span>Shared</div>
+      <div class="leg"><span class="leg-dot" style="background:#fb923c"></span>Trading Agent</div>
+      <div class="leg"><span class="leg-dot" style="background:#e879f9"></span>Shared Service</div>
       <div class="leg"><span class="leg-line" style="background:#4a4a6a"></span>Data / Dispatch</div>
       <div class="leg"><span class="leg-line" style="background:#e879f9"></span>Review Flow</div>
     </div>
@@ -177,6 +220,83 @@ footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;bo
       <h4>Connects To</h4>
       <ul class="conn-list" id="dpConns"></ul>
     </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════ INFRASTRUCTURE PAGE ═══════════════ -->
+<section id="infrastructure">
+<div class="section-inner">
+  <h2 class="section-title">Infrastructure</h2>
+  <p class="section-sub">Multi-bot Discord setup, Hermes Gateway profiles, and supporting services</p>
+
+  <div class="infra-grid">
+
+    <div class="infra-card">
+      <h3><span class="icon">🤖</span> Multi-Bot Discord</h3>
+      <ul>
+        <li><span class="status"></span><strong>OWL Master</strong> — #hermes-s8, orchestrates all agents</li>
+        <li><span class="status"></span><strong>Web SDLC</strong> — #web-sdlc, Next.js + Supabase + Vercel</li>
+        <li><span class="status"></span><strong>Flutter SDLC</strong> — #flutter-sdlc, mobile dev</li>
+        <li><span class="status"></span><strong>hime-trader-joe</strong> — #trading, market analysis</li>
+        <li>Each bot runs as independent systemd service</li>
+        <li>API_SERVER_ENABLED=false on all profile gateways</li>
+      </ul>
+    </div>
+
+    <div class="infra-card">
+      <h3><span class="icon">⚙️</span> Hermes Gateway</h3>
+      <ul>
+        <li><span class="status"></span>4 profiles running (WSL, foreground mode)</li>
+        <li><span class="status"></span>hermes-gateway-web-sdlc.service</li>
+        <li><span class="status"></span>hermes-gateway-flutter-sdlc.service</li>
+        <li><span class="status"></span>hermes-gateway-hime-trader-joe.service</li>
+        <li>Root gateway removed — all channels on dedicated bots</li>
+        <li>Each profile has own channel_prompts in config.yaml</li>
+      </ul>
+    </div>
+
+    <div class="infra-card">
+      <h3><span class="icon">📝</span> Obsidian Vault</h3>
+      <ul>
+        <li><span class="status"></span>Auto-updates after every session</li>
+        <li>[[wikilinks]] for cross-referencing all connections</li>
+        <li>Session Log + project notes maintained automatically</li>
+        <li>Location: ~/Documents/Obsidian Vault/</li>
+      </ul>
+    </div>
+
+    <div class="infra-card">
+      <h3><span class="icon">🔄</span> GitHub Backup</h3>
+      <ul>
+        <li><span class="status"></span>Daily 2 AM cron job</li>
+        <li>Backs up all profiles, skills, memories, config</li>
+        <li>Private repo: exor312/hermes-agent-backup</li>
+        <li>All code changes → Review → Test → Build → Release</li>
+      </ul>
+    </div>
+
+    <div class="infra-card">
+      <h3><span class="icon">🛡️</span> Pipeline Enforcement</h3>
+      <ul>
+        <li><span class="status"></span>ALL code changes go through proper pipeline</li>
+        <li>Review → Test → Build → Release, no exceptions</li>
+        <li>Web: PRD → Architecture → Supabase → UI/UX → Tickets → Code → Review → Integration → Test → Build → Vercel Deploy → Change</li>
+        <li>Flutter: IDEA → PRD → ARCH → TICKETS → CODE → REVIEW → TEST → BUILD</li>
+      </ul>
+    </div>
+
+    <div class="infra-card">
+      <h3><span class="icon">🔧</span> Tech Stack</h3>
+      <ul>
+        <li><span class="status"></span>Next.js 15 + Supabase + Vercel (web)</li>
+        <li><span class="status"></span>Flutter + Dart 3 (mobile)</li>
+        <li>Tailwind CSS + shadcn/ui (styling)</li>
+        <li>Japanese Muji aesthetic (design language)</li>
+        <li>Hermes Agent + Discord bots (orchestration)</li>
+      </ul>
+    </div>
+
   </div>
 </div>
 </section>
@@ -200,7 +320,6 @@ footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;bo
           <span class="chip tech">Supabase</span>
           <span class="chip tech">shadcn/ui</span>
           <span class="chip">Web SDLC v4</span>
-          <span class="chip">48 files</span>
         </div>
         <div class="links">
           <a href="https://github.com/exor312/photo-studio" target="_blank">GitHub →</a>
@@ -214,66 +333,49 @@ footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;bo
       </div>
       <div class="project-body">
         <h3>Resume Website</h3>
-        <p>Interactive portfolio with full-view project modals, day/night theme toggle, Impact & Results stats per project, keyboard navigation, and smooth animations.</p>
+        <p>Interactive portfolio with full-view project modals, day/night theme toggle, Impact & Results stats per project, keyboard navigation, and smooth animations. Live deployment on Vercel.</p>
         <div class="project-meta">
-          <span class="chip tech">Next.js</span>
+          <span class="chip tech">Next.js 15</span>
           <span class="chip tech">Vercel</span>
           <span class="chip">Web SDLC</span>
         </div>
         <div class="links">
           <a href="https://resume-website-ten-orpin.vercel.app" target="_blank">Live Site →</a>
+          <a href="https://github.com/exor312/resume-website" target="_blank">GitHub →</a>
         </div>
       </div>
     </div>
 
     <div class="project-card">
       <div class="project-thumb" style="background:linear-gradient(135deg,#0c1445,#1a237e)">
-        <div>🎮</div>
+        <div>📈</div>
       </div>
       <div class="project-body">
-        <h3>Mini Games <span style="color:var(--text3);font-weight:400">v1.1.2</span></h3>
-        <p>Educational Flutter mini-games app with Math game (10-question rounds, XP system, completion tracking), home navigation, and extensible subject architecture.</p>
+        <h3>Trading Bot</h3>
+        <p>Automated trading system with market analysis, trend detection, news analysis, order execution, position monitoring, circuit breaker protection, stale exit management, trade journaling, and Supabase integration via Alpaca API.</p>
         <div class="project-meta">
-          <span class="chip tech">Flutter</span>
-          <span class="chip tech">Dart 3</span>
-          <span class="chip">Flutter SDLC</span>
-          <span class="chip">5 subjects</span>
+          <span class="chip tech">Python</span>
+          <span class="chip tech">Alpaca API</span>
+          <span class="chip tech">Supabase</span>
+          <span class="chip">Multi-agent</span>
         </div>
         <div class="links">
-          <a href="https://github.com/exor312/mini-games-app" target="_blank">GitHub →</a>
+          <a href="https://github.com/exor312/" target="_blank">GitHub →</a>
         </div>
       </div>
     </div>
 
     <div class="project-card">
       <div class="project-thumb" style="background:linear-gradient(135deg,#1a0a2e,#2d1b69)">
-        <div>👶</div>
+        <div>🦉</div>
       </div>
       <div class="project-body">
-        <h3>ToddlerSpeak <span style="color:var(--text3);font-weight:400">v1.0.1</span></h3>
-        <p>Language learning app for ages 1–2 with Core Data persistence, visual flashcards, audio playback, progress tracking, and parental dashboard.</p>
+        <h3>OWL Ecosystem <span style="color:var(--text3);font-weight:400">this site</span></h3>
+        <p>Interactive visualization of the OWL agent ecosystem. Interactive SVG graph with pipeline filtering, agent detail panels, and full project showcase. Dark theme with Muji aesthetic.</p>
         <div class="project-meta">
-          <span class="chip tech">Flutter</span>
-          <span class="chip tech">Core Data</span>
-          <span class="chip">Flutter SDLC</span>
-        </div>
-        <div class="links">
-          <a href="https://github.com/exor312/toddler-speak-app" target="_blank">GitHub →</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="project-card">
-      <div class="project-thumb" style="background:linear-gradient(135deg,#0a1628,#0d2137)">
-        <div>💰</div>
-      </div>
-      <div class="project-body">
-        <h3>Budget Tracker</h3>
-        <p>Personal finance Flutter app with transaction management (cash, debit, credit, loan, stocks), date/time tracking, dark mode, statistical graphs, and account type categorization.</p>
-        <div class="project-meta">
-          <span class="chip tech">Flutter</span>
-          <span class="chip tech">fl_chart</span>
-          <span class="chip">Flutter SDLC</span>
+          <span class="chip tech">Static HTML</span>
+          <span class="chip tech">Vercel</span>
+          <span class="chip">Manual</span>
         </div>
         <div class="links">
           <a href="https://github.com/exor312/" target="_blank">GitHub →</a>
@@ -292,180 +394,200 @@ footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;bo
 <script>
 // ═══════════════════ AGENT DATA ═══════════════════
 const agents = {
-  // ── Shared / Core ──
-  hermes: {id:'hermes',label:'Hermes\nGateway',sub:'Channel Router',pipeline:'core',color:'#fbbf24',phase:0,
-    desc:'The central Hermes agent. Receives all user messages, routes to the correct pipeline profile (Flutter SDLC, Web SDLC, or General). Manages memory, skills, Obsidian vault updates, and GitHub backup cron jobs.',
+  // ── OWL Master Orchestrator ──
+  owl: {id:'owl',label:'OWL\\nMaster Orchestrator',sub:'Mission Control',pipeline:'core',color:'#fbbf24',phase:0,
+    desc:'The top-level orchestrator. Receives missions from Shin (GRAPES), decomposes into tasks, delegates to specialist agents (Web SDLC, Flutter SDLC, hime-trader-joe). Tracks progress via Kanban. Reports status back. Pipeline enforcement: ALL code changes → Review → Test → Build → Release.',
     conns:[
+      {target:'hermes',type:'route',label:'Message routing'},
       {target:'orch-web',type:'dispatch',label:'Web tasks →'},
       {target:'orch-flutter',type:'dispatch',label:'Flutter tasks →'},
+      {target:'trading',type:'dispatch',label:'Trading tasks →'},
       {target:'obsidian',type:'write',label:'Vault updates'},
-      {target:'github-shared',type:'push',label:'Code commits'}
+      {target:'github-shared',type:'push',label:'Backup commits'}
     ]},
-  obsidian: {id:'obsidian',label:'Obsidian\nVault',sub:'Documentation',pipeline:'core',color:'#fbbf24',phase:0,
+  hermes: {id:'hermes',label:'Hermes\\nGateway',sub:'Multi-Bot Router',pipeline:'core',color:'#fbbf24',phase:0,
+    desc:'Runs 4 Discord bot profiles: OWL Master, Web SDLC, Flutter SDLC, hime-trader-joe. Each profile is an independent systemd service. Routes messages to the correct pipeline. Manages memory, skills, and Obsidian vault updates.',
+    conns:[
+      {target:'obsidian',type:'write',label:'Vault updates'},
+      {target:'github-shared',type:'push',label:'Auto-backup'}
+    ]},
+  obsidian: {id:'obsidian',label:'Obsidian\\nVault',sub:'Documentation',pipeline:'core',color:'#e879f9',phase:0,
     desc:'Auto-updates the Obsidian vault after every session with task summaries, [[wikilinks]] for cross-referencing, and project documentation. Maintains the Session Log and project notes.',
     conns:[]},
-  'github-shared': {id:'github-shared',label:'GitHub\nBackup',sub:'Auto-backup',pipeline:'core',color:'#fbbf24',phase:0,
-    desc:'Daily 2 AM cron job that backs up all Hermes profiles, skills, memories, and config to the private exor312/hermes-agent-backup repository.',
+  'github-shared': {id:'github-shared',label:'GitHub\\nBackup',sub:'Daily 2 AM cron',pipeline:'core',color:'#e879f9',phase:0,
+    desc:'Daily cron job that backs up all Hermes profiles, skills, memories, and config to the private exor312/hermes-agent-backup repository.',
     conns:[]},
 
   // ── Web SDLC Orchestrator ──
-  'orch-web': {id:'orch-web',label:'Orchestrator',sub:'Web SDLC',pipeline:'web',color:'#7c6cf0',phase:0,
-    desc:'The sole agent with hands in the Web pipeline. Reads/writes files, calls all 22 sub-agents, manages project.json state machine. User only talks to this agent directly. All other web agents are invisible.',
+  'orch-web': {id:'orch-web',label:'Orchestrator\\n(Web)',sub:'23-agent pipeline',pipeline:'web',color:'#7c6cf0',phase:0,
+    desc:'State machine for Next.js 15 web projects. Manages phases: PRD → Architecture → Supabase → UI/UX → Tickets → Code → Review → Integration → Test → Build → Vercel Deploy → Change. HARD GATE at each phase boundary requiring user APPROVE.',
     conns:[
       {target:'prd-web',type:'dispatch',label:'Phase 1: PRD'},
       {target:'arch-web',type:'dispatch',label:'Phase 2: Architect'},
-      {target:'supa-web',type:'dispatch',label:'Phase 2.5: Provision'},
+      {target:'supa-web',type:'dispatch',label:'Phase 2.5: Supabase'},
       {target:'uiux-web',type:'dispatch',label:'Phase 3: UI/UX'},
       {target:'ticket-web',type:'dispatch',label:'Phase 4: Tickets'},
+      {target:'coders-web',type:'dispatch',label:'Phase 5-6: Code Loop'},
       {target:'test-web',type:'dispatch',label:'Phase 7: Tests'},
       {target:'build-web',type:'dispatch',label:'Phase 8: Build'},
       {target:'change-web',type:'dispatch',label:'Phase 9: Changes'}
     ]},
-  'prd-web': {id:'prd-web',label:'PRD\nAgent',sub:'Requirements',pipeline:'web',color:'#22d3ee',phase:1,
-    desc:'Interviews the user to capture project requirements. Produces structured PRD with pages, features, entities, integrations, and design tone. Output feeds into Architect agent.',
+  'prd-web': {id:'prd-web',label:'PRD\\nAgent',sub:'Requirements',pipeline:'web',color:'#22d3ee',phase:1,
+    desc:'Interviews the user to capture project requirements. Produces structured PRD with pages, features, entities, integrations, and design tone.',
     conns:[
       {target:'arch-web',type:'output',label:'PRD → Architect'},
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'arch-web': {id:'arch-web',label:'Architect\nAgent',sub:'Blueprint',pipeline:'web',color:'#22d3ee',phase:2,
+  'arch-web': {id:'arch-web',label:'Architect\\nAgent',sub:'Decision Trees',pipeline:'web',color:'#22d3ee',phase:2,
     desc:'Makes all tech decisions via 6 decision trees (DT-1 through DT-6): API strategy, state management, auth, database, rendering, integrations. Produces complete project blueprint.',
     conns:[
-      {target:'supa-web',type:'output',label:'Architecture →'},
+      {target:'supa-web',type:'output',label:'DB schema →'},
       {target:'uiux-web',type:'output',label:'Component map →'},
-      {target:'ticket-web',type:'output',label:'Architecture →'},
+      {target:'ticket-web',type:'output',label:'Arch → Tickets'},
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'supa-web': {id:'supa-web',label:'Supabase\nProvisioner',sub:'DB + Auth',pipeline:'web',color:'#22d3ee',phase:2.5,
-    desc:'Finds or creates Supabase project via Management API. Sets up DB, auth, API keys, live schema capture. Always runs findproject first to avoid duplicates. CONDITIONAL: skipped for static sites.',
+  'supa-web': {id:'supa-web',label:'Supabase\\nProvisioner',sub:'DB + Auth',pipeline:'web',color:'#22d3ee',phase:2.5,
+    desc:'Finds or creates Supabase project via Management API. Sets up DB, auth, API keys, live schema capture. Always findproject first to avoid duplicates.',
     conns:[
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'uiux-web': {id:'uiux-web',label:'UI/UX\nAgent',sub:'Design System',pipeline:'web',color:'#22d3ee',phase:3,
-    desc:'Defines full design system: color palette, typography, spacing, component specs, animations, CSS variables. Tone derived from PRD. Output feeds into Config, Frontend, and Component coders.',
+  'uiux-web': {id:'uiux-web',label:'UI/UX\\nAgent',sub:'Design System',pipeline:'web',color:'#22d3ee',phase:3,
+    desc='Defines full design system: color palette, typography, spacing, component specs, animations, CSS variables. Japanese Muji aesthetic by default.',
     conns:[
       {target:'coders-web',type:'output',label:'Design tokens →'},
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'ticket-web': {id:'ticket-web',label:'Ticket\nAgent',sub:'Dependency Graph',pipeline:'web',color:'#22d3ee',phase:4,
-    desc:'Breaks architecture into atomic tickets with dependency graph. Groups: Foundation → Supabase → Middleware → Auth → Layouts → Actions → API Routes → Integrations → Components → Pages → Deploy.',
+  'ticket-web': {id:'ticket-web',label:'Ticket\\nAgent',sub:'Dep Graph',pipeline:'web',color:'#22d3ee',phase:4,
+    desc:'Breaks architecture into atomic tickets with dependency graph. Groups: Foundation → Supabase → Auth → Layouts → Actions → API Routes → Components → Pages → Deploy.',
     conns:[
-      {target:'coders-web',type:'output',label:'Tickets → Coders'},
-      {target:'reviewers-web',type:'output',label:'Tickets → Reviewers'}
+      {target:'coders-web',type:'output',label:'Tickets → Coders'}
     ]},
-  'coders-web': {id:'coders-web',label:'Coder\nAgents',sub:'代码 × 6 types',pipeline:'web',color:'#22d3ee',phase:5,
-    desc:'Parallel coder group: DB Coder (SQL migrations), Backend Coder (server actions, API routes), Frontend Coder (pages), Component Coder (UI components), Config Coder (next.config, tailwind), Integration Coder (third-party APIs), Vercel Coder (deployment config).',
+  'coders-web': {id:'coders-web',label:'Coder\\nAgents',sub:'×7 types',pipeline:'web',color:'#22d3ee',phase:5,
+    desc:'Parallel coders: DB (SQL), Backend (server actions), Frontend (pages), Component (UI), Config (next.config), Integration (APIs), Vercel (deploy config).',
     conns:[
       {target:'reviewers-web',type:'review',label:'Code → Review (pink)'},
       {target:'orch-web',type:'report',label:'PASS / FAIL'}
     ]},
-  'reviewers-web': {id:'reviewers-web',label:'Review\nAgents',sub:'Quality × 6 types',pipeline:'web',color:'#e879f9',phase:6,
-    desc:'Parallel reviewer group matching each coder type. DB Review (RLS, idempotent SQL, schema match), Backend Review (security, server guards), Frontend Review (imports, Tailwind, a11y), Component Review, Config Review, Integration Review (API key exposure, DOCS_REQUIRED flow).',
+  'reviewers-web': {id:'reviewers-web',label:'Review\\nAgents',sub:'×7 types',pipeline:'web',color:'#e879f9',phase:6,
+    desc:'Parallel reviewers matching each coder. DB Review (RLS, idempotent SQL), Backend Review (security), Frontend Review (imports, Tailwind, a11y), plus Config, Component, Integration, Vercel.',
     conns:[
-      {target:'coders-web',type:'feedback',label:'FAIL → Retry coder'},
+      {target:'coders-web',type:'feedback',label:'FAIL → Retry'},
       {target:'orch-web',type:'report',label:'PASS / FAIL'}
     ]},
-  'test-web': {id:'test-web',label:'Test\nAgent',sub:'Test Suite',pipeline:'web',color:'#22d3ee',phase:7,
-    desc:'Generates test suite covering all feature tickets. Auto-generated → advance to Build. CONDITIONAL: may be skipped for static sites.',
+  'test-web': {id:'test-web',label:'Test\\nAgent',sub:'Test Suite',pipeline:'web',color:'#22d3ee',phase:7,
+    desc:'Generates test suite covering all feature tickets. Auto-advance to Build.',
     conns:[
       {target:'build-web',type:'output',label:'Tests → Build'}
     ]},
-  'build-web': {id:'build-web',label:'Build\nAgent',sub:'Package + Ship',pipeline:'web',color:'#22d3ee',phase:8,
-    desc:'Audits dependencies, generates package.json/README/.gitignore, creates GitHub repo, pushes all code. HARD GATE: user APPROVE required before any files are committed.',
+  'build-web': {id:'build-web',label:'Build\\nAgent',sub:'Ship',pipeline:'web',color:'#22d3ee',phase:8,
+    desc='Audits dependencies, generates package.json/README/.gitignore, creates GitHub repo, pushes all code. Vercel deployment config. HARD GATE: APPROVE required.',
     conns:[
       {target:'github-shared',type:'push',label:'Push to GitHub'},
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'change-web': {id:'change-web',label:'Change\nAgent',sub:'Post-ship edits',pipeline:'web',color:'#22d3ee',phase:9,
-    desc:'Handles post-delivery change requests. Classifies change type (visual, schema, logic, feature, bug fix, config). Produces surgical change plan → APPROVE → execute.',
+  'change-web': {id:'change-web',label:'Change\\nAgent',sub:'Post-ship edits',pipeline:'web',color:'#22d3ee',phase:9,
+    desc='Handles post-delivery change requests. Classifies: visual, schema, logic, feature, bug fix, config. Surgical change plan → APPROVE → execute.',
     conns:[
       {target:'coders-web',type:'output',label:'Change → Coder'},
       {target:'orch-web',type:'report',label:'Change plan → APPROVE'}
     ]},
 
   // ── Flutter SDLC Orchestrator ──
-  'orch-flutter': {id:'orch-flutter',label:'Orchestrator',sub:'Flutter SDLC',pipeline:'flutter',color:'#7c6cf0',phase:0,
-    desc:'State machine-driven orchestrator for Flutter projects. Manages IDEA → PRD → ARCH → TICKETS → CODE → REVIEW → TEST → BUILD → NEVER dispatches two agents simultaneously. One action per invocation, always JSON output.',
+  'orch-flutter': {id:'orch-flutter',label:'Orchestrator\\n(Flutter)',sub:'10-agent pipeline',pipeline:'flutter',color:'#7c6cf0',phase:0,
+    desc:'State machine for Flutter mobile projects. IDEA → PRD → ARCH → TICKETS → CODE → REVIEW → TEST → BUILD. One action per invocation, always JSON output. Never dispatches two agents simultaneously.',
     conns:[
-      {target:'prd-flutter',type:'dispatch',label:'IDEA: PRD Agent'},
+      {target:'prd-flutter',type:'dispatch',label:'IDEA: PRD'},
       {target:'arch-flutter',type:'dispatch',label:'PRD✓: Architect'},
       {target:'ticket-flutter',type:'dispatch',label:'ARCH✓: Tickets'},
       {target:'coders-flutter',type:'dispatch',label:'TICKETS✓: Code loop'},
       {target:'test-flutter',type:'dispatch',label:'CODE✓: Tests'},
       {target:'build-flutter',type:'dispatch',label:'TEST✓: Build'}
     ]},
-  'prd-flutter': {id:'prd-flutter',label:'PRD\nAgent',sub:'Requirements',pipeline:'flutter',color:'#4ade80',phase:1,
-    desc:'Captures Flutter app requirements via structured interview. Covers screens, features, user flows, entities, integrations, design references, and out-of-scope items.',
+  'prd-flutter': {id:'prd-flutter',label:'PRD\\nAgent',sub:'Requirements',pipeline:'flutter',color:'#4ade80',phase:1,
+    desc:'Captures Flutter app requirements: screens, features, user flows, entities, integrations, design references.',
     conns:[
       {target:'arch-flutter',type:'output',label:'PRD → Architect'},
       {target:'orch-flutter',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'arch-flutter': {id:'arch-flutter',label:'Architect\nAgent',sub:'Flutter Stack',pipeline:'flutter',color:'#4ade80',phase:2,
-    desc:'Decides Flutter architecture: state management (Provider/Riverpod/Bloc), navigation (go_router), folder structure, key packages, theming strategy. Produces complete project blueprint.',
+  'arch-flutter': {id:'arch-flutter',label:'Architect\\n(Flutter)',sub:'Flutter Stack',pipeline:'flutter',color:'#4ade80',phase:2,
+    desc='Decides Flutter architecture: state management (Provider/Riverpod/Bloc), navigation (go_router), folder structure, packages, theming.',
     conns:[
       {target:'ticket-flutter',type:'output',label:'Arch → Tickets'},
       {target:'orch-flutter',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'ticket-flutter': {id:'ticket-flutter',label:'Ticket\nAgent',sub:'Task Breakdown',pipeline:'flutter',color:'#4ade80',phase:3,
-    desc:'Generates sequenced development tickets from architecture. Each ticket maps to one file/widget. Tracks dependency ordering and parallelization opportunities.',
+  'ticket-flutter': {id:'ticket-flutter',label:'Ticket\\nAgent',sub:'Task Breakdown',pipeline:'flutter',color:'#4ade80',phase:3,
+    desc='Generates sequenced tickets from architecture. Each ticket maps to one file/widget with dependency ordering.',
     conns:[
-      {target:'coders-flutter',type:'output',label:'Tickets → Coder/Review'}
+      {target:'coders-flutter',type:'output',label:'Tickets → Code/Review'}
     ]},
-  'coders-flutter': {id:'coders-flutter',label:'Coder Agent',sub:'Flutter Code',pipeline:'flutter',color:'#4ade80',phase:4,
-    desc:'Writes Flutter/Dart code for each ticket. Handles models, screens, widgets, services, state management. Checks existing files first to avoid overwriting working code. Validates with flutter analyze before marking done.',
+  'coders-flutter': {id:'coders-flutter',label:'Coder\\nAgent',sub:'Flutter Code',pipeline:'flutter',color:'#4ade80',phase:4,
+    desc:'Writes Flutter/Dart code per ticket. Models, screens, widgets, services, state management. Checks existing files first. Validates with flutter analyze.',
     conns:[
       {target:'review-flutter',type:'review',label:'Code → Review (pink)'},
-      {target:'orch-flutter',type:'report',label:'Output → Orchestrator'}
-    ]},
-  'review-flutter': {id:'review-flutter',label:'Review\nAgent',sub:'Code Quality',pipeline:'flutter',color:'#e879f9',phase:5,
-    desc:'Reviews generated Flutter code against checklist: no analyzer errors, proper state management patterns, null safety, dependency injection, test compatibility. Returns PASS/FAIL with correction instructions.',
-    conns:[
-      {target:'coders-flutter',type:'feedback',label:'FAIL → Retry coder'},
       {target:'orch-flutter',type:'report',label:'PASS / FAIL'}
     ]},
-  'test-flutter': {id:'test-flutter',label:'Test\nAgent',sub:'Flutter Tests',pipeline:'flutter',color:'#4ade80',phase:6,
-    desc:'Generates widget tests and unit tests for each ticket. Handles provider mocking, SharedPreferences initialization, binding setup. Ensures all tests pass before BUILD phase.',
+  'review-flutter': {id:'review-flutter',label:'Review\\nAgent',sub:'Code Quality',pipeline:'flutter',color:'#e879f9',phase:5,
+    desc:'Reviews Flutter code: no analyzer errors, state management patterns, null safety, dependency injection, test compatibility.',
+    conns:[
+      {target:'coders-flutter',type:'feedback',label:'FAIL → Retry'},
+      {target:'orch-flutter',type:'report',label:'PASS / FAIL'}
+    ]},
+  'test-flutter': {id:'test-flutter',label:'Test\\nAgent',sub:'Flutter Tests',pipeline:'flutter',color:'#4ade80',phase:6,
+    desc:'Generates widget tests and unit tests. Provider mocking, SharedPreferences setup. All must pass before BUILD.',
     conns:[
       {target:'build-flutter',type:'output',label:'Tests → Build'},
-      {target:'orch-flutter',type:'report',label:'All passed → advance'}
+      {target:'orch-flutter',type:'report',label:'All passed'}
     ]},
-  'build-flutter': {id:'build-flutter',label:'Build\nAgent',sub:'APK + Release',pipeline:'flutter',color:'#4ade80',phase:7,
-    desc:'Builds release APK, creates GitHub release with APK attachment and git tag. Full SDLC mandate: Review → Test → Build → Release. No exceptions — never says "done" without completing all four phases.',
+  'build-flutter': {id:'build-flutter',label:'Build\\nAgent',sub:'APK + Release',pipeline:'flutter',color:'#4ade80',phase:7,
+    desc:'Builds release APK, creates GitHub release with APK attachment and git tag. Full SDLC mandate: Review → Test → Build → Release.',
     conns:[
-      {target:'github-shared',type:'release',label:'GitHub Release + Tag'},
+      {target:'github-shared',type:'release',label:'GitHub Release'},
       {target:'orch-flutter',type:'report',label:'APK ready → DONE'}
+    ]},
+
+  // ── Trading / Market Analysis ──
+  'trading': {id:'trading',label:'hime-\\ntrader-joe',sub:'Market Analysis',pipeline:'trading',color:'#fb923c',phase:0,
+    desc:'Trading & market analysis agent. Analyzes markets, detects trends, monitors news, executes orders via Alpaca API, manages positions with circuit breaker protection, stale exit management, and trade journaling. Discord bot on #trading channel.',
+    conns:[
+      {target:'github-shared',type:'push',label:'Trade logs'},
+      {target:'obsidian',type:'write',label:'Journal entries'}
     ]},
 };
 
 // ═══════════════════ LAYOUT ═══════════════════
 const layout = {
-  // Row 0: Hermes at top center
-  hermes: {x:480,y:50,w:120,h:56},
-  // Row 1: Three orchestrators
-  'orch-web':    {x:660,y:160,w:120,h:56},
-  'orch-flutter':{x:300,y:160,w:120,h:56},
-  // Row 2: Phase agents
-  'prd-web':     {x:550,y:270,w:100,h:48},
-  'arch-web':    {x:670,y:270,w:100,h:48},
-  'supa-web':    {x:790,y:270,w:100,h:48},
-  'uiux-web':    {x:670,y:340,w:100,h:48},
-  'ticket-web':  {x:790,y:340,w:100,h:48},
-  'prd-flutter': {x:180,y:270,w:100,h:48},
-  'arch-flutter':{x:300,y:270,w:100,h:48},
-  'ticket-flutter':{x:420,y:270,w:100,h:48},
-  // Row 3: Coders + Reviewers
-  'coders-web':   {x:580,y:430,w:120,h:48},
-  'reviewers-web':{x:740,y:430,w:120,h:48},
-  'coders-flutter':  {x:240,y:400,w:120,h:48},
-  'review-flutter':  {x:380,y:400,w:120,h:48},
-  // Row 4: Test, Build, Change
-  'test-web':    {x:520,y:520,w:100,h:48},
-  'build-web':   {x:640,y:520,w:100,h:48},
-  'change-web': {x:760,y:520,w:100,h:48},
-  'test-flutter':  {x:180,y:500,w:100,h:48},
-  'build-flutter': {x:300,y:500,w:100,h:48},
-  // Shared services at bottom
-  'obsidian':     {x:80,y:460,w:100,h:48},
-  'github-shared':{x:80,y:530,w:100,h:48},
+  // Row 0: OWL at top center
+  owl:         {x:480, y:30, w:130, h:56},
+  // Row 1: Hermes + shared services
+  hermes:      {x:480, y:130, w:130, h:52},
+  // Row 2: Three specialist orchestrators
+  'orch-web':    {x:700, y:240, w:120, h:52},
+  'orch-flutter':{x:280, y:240, w:120, h:52},
+  trading:       {x:490, y:240, w:120, h:52},
+  // Row 3: Phase agents — Web
+  'prd-web':     {x:600, y:340, w:95, h:44},
+  'arch-web':    {x:710, y:340, w:95, h:44},
+  'supa-web':    {x:820, y:340, w:95, h:44},
+  'uiux-web':    {x:710, y:400, w:95, h:44},
+  'ticket-web':  {x:820, y:400, w:95, h:44},
+  // Row 3: Phase agents — Flutter
+  'prd-flutter': {x:170, y:340, w:95, h:44},
+  'arch-flutter':{x:280, y:340, w:95, h:44},
+  'ticket-flutter':{x:390, y:340, w:95, h:44},
+  // Row 4: Coders + Reviewers
+  'coders-web':     {x:620, y:490, w:120, h:44},
+  'reviewers-web':  {x:770, y:490, w:120, h:44},
+  'coders-flutter': {x:240, y:470, w:120, h:44},
+  'review-flutter': {x:380, y:470, w:120, h:44},
+  // Row 5: Test, Build, Change
+  'test-web':    {x:560, y:580, w:95, h:44},
+  'build-web':   {x:670, y:580, w:95, h:44},
+  'change-web':  {x:780, y:580, w:95, h:44},
+  'test-flutter':  {x:170, y:570, w:95, h:44},
+  'build-flutter': {x:280, y:570, w:95, h:44},
+  // Shared services at right
+  'obsidian':     {x:920, y:130, w:100, h:44},
+  'github-shared':{x:920, y:190, w:100, h:44},
 };
 
 let activePipeline = 'all';
@@ -515,7 +637,6 @@ function renderGraph(){
     const pos = layout[id];
     if(!pos) continue;
     let dimmed = focusedNode && focusedNode !== id;
-    // Check if connected to focused
     if(focusedNode && focusedNode !== id){
       const fConns = agents[focusedNode]?.conns.map(c=>c.target) || [];
       if(!fConns.includes(id) && !agents[id]?.conns.map(c=>c.target).includes(focusedNode)) dimmed = true;
@@ -536,7 +657,6 @@ function renderGraph(){
     if(focusedNode===id) rect.setAttribute('filter','url(#glow)');
     g.appendChild(rect);
 
-    // Label lines
     const lines = agent.label.split('\n');
     const cy = pos.y + pos.h/2 - ((lines.length-1)*7);
     for(let i=0;i<lines.length;i++){
@@ -568,7 +688,8 @@ function showDetail(id){
   renderGraph();
   document.getElementById('dpTitle').textContent = a.label.replace('\n',' ');
   const tag = document.getElementById('dpTag');
-  tag.textContent = a.pipeline === 'web' ? 'Web SDLC' : a.pipeline === 'flutter' ? 'Flutter SDLC' : 'Core Service';
+  const pipelineLabels = {web:'Web SDLC',flutter:'Flutter SDLC',trading:'Trading / Market',core:'Core / Shared'};
+  tag.textContent = pipelineLabels[a.pipeline] || a.pipeline;
   tag.style.background = a.color+'25';
   tag.style.color = a.color;
   document.getElementById('dpDesc').textContent = a.desc;
@@ -600,7 +721,7 @@ function filterPipeline(p){
   renderGraph();
 }
 
-// ═══════════════════ PAN + ZOOM ═══════════════════
+// ═══════════════════ PAN ═══════════════════
 const container = document.getElementById('graphContainer');
 let isPanning = false, startX, startY, scrollL, scrollT;
 container.addEventListener('mousedown',(e)=>{
@@ -611,8 +732,6 @@ container.addEventListener('mousedown',(e)=>{
 });
 document.addEventListener('mousemove',e=>{if(!isPanning)return;container.scrollLeft=scrollL-(e.pageX-startX);container.scrollTop=scrollT-(e.pageY-startY);});
 document.addEventListener('mouseup',()=>{isPanning=false;container.style.cursor='grab';});
-
-// click on blank area to deselect
 container.addEventListener('click',e=>{
   if(e.target===container||e.target.classList.contains('graph-svg')){ closePanel(); }
 });
@@ -625,9 +744,11 @@ function setNav(el){
 window.addEventListener('scroll',()=>{
   const y = window.scrollY + 80;
   const agentsTop = document.getElementById('agents').offsetTop;
+  const infraTop = document.getElementById('infrastructure').offsetTop;
   const projectsTop = document.getElementById('projects').offsetTop;
   document.querySelectorAll('.links a').forEach(a=>a.classList.remove('active'));
-  if(y >= projectsTop) document.querySelectorAll('.links a')[1].classList.add('active');
+  if(y >= projectsTop) document.querySelectorAll('.links a')[2].classList.add('active');
+  else if(y >= infraTop) document.querySelectorAll('.links a')[1].classList.add('active');
   else document.querySelectorAll('.links a')[0].classList.add('active');
 });
 
@@ -635,4 +756,3 @@ window.addEventListener('scroll',()=>{
 renderGraph();
 </script>
 </body>
-</html>
