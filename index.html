@@ -395,7 +395,7 @@ footer{text-align:center;padding:40px 24px;color:var(--text3);font-size:.8rem;bo
 // ═══════════════════ AGENT DATA ═══════════════════
 const agents = {
   // ── OWL Master Orchestrator ──
-  owl: {id:'owl',label:'OWL\\nMaster Orchestrator',sub:'Mission Control',pipeline:'core',color:'#fbbf24',phase:0,
+  owl: {id:'owl',label:'OWL Master Orchestrator',sub:'Mission Control',pipeline:'core',color:'#fbbf24',phase:0,
     desc:'The top-level orchestrator. Receives missions from Shin (GRAPES), decomposes into tasks, delegates to specialist agents (Web SDLC, Flutter SDLC, hime-trader-joe). Tracks progress via Kanban. Reports status back. Pipeline enforcement: ALL code changes → Review → Test → Build → Release.',
     conns:[
       {target:'hermes',type:'route',label:'Message routing'},
@@ -405,21 +405,21 @@ const agents = {
       {target:'obsidian',type:'write',label:'Vault updates'},
       {target:'github-shared',type:'push',label:'Backup commits'}
     ]},
-  hermes: {id:'hermes',label:'Hermes\\nGateway',sub:'Multi-Bot Router',pipeline:'core',color:'#fbbf24',phase:0,
+  hermes: {id:'hermes',label:'Hermes Gateway',sub:'Multi-Bot Router',pipeline:'core',color:'#fbbf24',phase:0,
     desc:'Runs 4 Discord bot profiles: OWL Master, Web SDLC, Flutter SDLC, hime-trader-joe. Each profile is an independent systemd service. Routes messages to the correct pipeline. Manages memory, skills, and Obsidian vault updates.',
     conns:[
       {target:'obsidian',type:'write',label:'Vault updates'},
       {target:'github-shared',type:'push',label:'Auto-backup'}
     ]},
-  obsidian: {id:'obsidian',label:'Obsidian\\nVault',sub:'Documentation',pipeline:'core',color:'#e879f9',phase:0,
+  obsidian: {id:'obsidian',label:'Obsidian Vault',sub:'Documentation',pipeline:'core',color:'#e879f9',phase:0,
     desc:'Auto-updates the Obsidian vault after every session with task summaries, [[wikilinks]] for cross-referencing, and project documentation. Maintains the Session Log and project notes.',
     conns:[]},
-  'github-shared': {id:'github-shared',label:'GitHub\\nBackup',sub:'Daily 2 AM cron',pipeline:'core',color:'#e879f9',phase:0,
+  'github-shared': {id:'github-shared',label:'GitHub Backup',sub:'Daily 2 AM cron',pipeline:'core',color:'#e879f9',phase:0,
     desc:'Daily cron job that backs up all Hermes profiles, skills, memories, and config to the private exor312/hermes-agent-backup repository.',
     conns:[]},
 
   // ── Web SDLC Orchestrator ──
-  'orch-web': {id:'orch-web',label:'Orchestrator\\n(Web)',sub:'23-agent pipeline',pipeline:'web',color:'#7c6cf0',phase:0,
+  'orch-web': {id:'orch-web',label:'Orchestrator (Web)',sub:'23-agent pipeline',pipeline:'web',color:'#7c6cf0',phase:0,
     desc:'State machine for Next.js 15 web projects. Manages phases: PRD → Architecture → Supabase → UI/UX → Tickets → Code → Review → Integration → Test → Build → Vercel Deploy → Change. HARD GATE at each phase boundary requiring user APPROVE.',
     conns:[
       {target:'prd-web',type:'dispatch',label:'Phase 1: PRD'},
@@ -432,13 +432,13 @@ const agents = {
       {target:'build-web',type:'dispatch',label:'Phase 8: Build'},
       {target:'change-web',type:'dispatch',label:'Phase 9: Changes'}
     ]},
-  'prd-web': {id:'prd-web',label:'PRD\\nAgent',sub:'Requirements',pipeline:'web',color:'#22d3ee',phase:1,
+  'prd-web': {id:'prd-web',label:'PRD Agent',sub:'Requirements',pipeline:'web',color:'#22d3ee',phase:1,
     desc:'Interviews the user to capture project requirements. Produces structured PRD with pages, features, entities, integrations, and design tone.',
     conns:[
       {target:'arch-web',type:'output',label:'PRD → Architect'},
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'arch-web': {id:'arch-web',label:'Architect\\nAgent',sub:'Decision Trees',pipeline:'web',color:'#22d3ee',phase:2,
+  'arch-web': {id:'arch-web',label:'Architect Agent',sub:'Decision Trees',pipeline:'web',color:'#22d3ee',phase:2,
     desc:'Makes all tech decisions via 6 decision trees (DT-1 through DT-6): API strategy, state management, auth, database, rendering, integrations. Produces complete project blueprint.',
     conns:[
       {target:'supa-web',type:'output',label:'DB schema →'},
@@ -446,54 +446,54 @@ const agents = {
       {target:'ticket-web',type:'output',label:'Arch → Tickets'},
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'supa-web': {id:'supa-web',label:'Supabase\\nProvisioner',sub:'DB + Auth',pipeline:'web',color:'#22d3ee',phase:2.5,
+  'supa-web': {id:'supa-web',label:'Supabase Provisioner',sub:'DB + Auth',pipeline:'web',color:'#22d3ee',phase:2.5,
     desc:'Finds or creates Supabase project via Management API. Sets up DB, auth, API keys, live schema capture. Always findproject first to avoid duplicates.',
     conns:[
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'uiux-web': {id:'uiux-web',label:'UI/UX\\nAgent',sub:'Design System',pipeline:'web',color:'#22d3ee',phase:3,
-    desc='Defines full design system: color palette, typography, spacing, component specs, animations, CSS variables. Japanese Muji aesthetic by default.',
+  'uiux-web': {id:'uiux-web',label:'UI/UX Agent',sub:'Design System',pipeline:'web',color:'#22d3ee',phase:3,
+    desc:'Defines full design system: color palette, typography, spacing, component specs, animations, CSS variables. Japanese Muji aesthetic by default.',
     conns:[
       {target:'coders-web',type:'output',label:'Design tokens →'},
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'ticket-web': {id:'ticket-web',label:'Ticket\\nAgent',sub:'Dep Graph',pipeline:'web',color:'#22d3ee',phase:4,
+  'ticket-web': {id:'ticket-web',label:'Ticket Agent',sub:'Dep Graph',pipeline:'web',color:'#22d3ee',phase:4,
     desc:'Breaks architecture into atomic tickets with dependency graph. Groups: Foundation → Supabase → Auth → Layouts → Actions → API Routes → Components → Pages → Deploy.',
     conns:[
       {target:'coders-web',type:'output',label:'Tickets → Coders'}
     ]},
-  'coders-web': {id:'coders-web',label:'Coder\\nAgents',sub:'×7 types',pipeline:'web',color:'#22d3ee',phase:5,
+  'coders-web': {id:'coders-web',label:'Coder Agents',sub:'×7 types',pipeline:'web',color:'#22d3ee',phase:5,
     desc:'Parallel coders: DB (SQL), Backend (server actions), Frontend (pages), Component (UI), Config (next.config), Integration (APIs), Vercel (deploy config).',
     conns:[
       {target:'reviewers-web',type:'review',label:'Code → Review (pink)'},
       {target:'orch-web',type:'report',label:'PASS / FAIL'}
     ]},
-  'reviewers-web': {id:'reviewers-web',label:'Review\\nAgents',sub:'×7 types',pipeline:'web',color:'#e879f9',phase:6,
+  'reviewers-web': {id:'reviewers-web',label:'Review Agents',sub:'×7 types',pipeline:'web',color:'#e879f9',phase:6,
     desc:'Parallel reviewers matching each coder. DB Review (RLS, idempotent SQL), Backend Review (security), Frontend Review (imports, Tailwind, a11y), plus Config, Component, Integration, Vercel.',
     conns:[
       {target:'coders-web',type:'feedback',label:'FAIL → Retry'},
       {target:'orch-web',type:'report',label:'PASS / FAIL'}
     ]},
-  'test-web': {id:'test-web',label:'Test\\nAgent',sub:'Test Suite',pipeline:'web',color:'#22d3ee',phase:7,
+  'test-web': {id:'test-web',label:'Test Agent',sub:'Test Suite',pipeline:'web',color:'#22d3ee',phase:7,
     desc:'Generates test suite covering all feature tickets. Auto-advance to Build.',
     conns:[
       {target:'build-web',type:'output',label:'Tests → Build'}
     ]},
-  'build-web': {id:'build-web',label:'Build\\nAgent',sub:'Ship',pipeline:'web',color:'#22d3ee',phase:8,
-    desc='Audits dependencies, generates package.json/README/.gitignore, creates GitHub repo, pushes all code. Vercel deployment config. HARD GATE: APPROVE required.',
+  'build-web': {id:'build-web',label:'Build Agent',sub:'Ship',pipeline:'web',color:'#22d3ee',phase:8,
+    desc:'Audits dependencies, generates package.json/README/.gitignore, creates GitHub repo, pushes all code. Vercel deployment config. HARD GATE: APPROVE required.',
     conns:[
       {target:'github-shared',type:'push',label:'Push to GitHub'},
       {target:'orch-web',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'change-web': {id:'change-web',label:'Change\\nAgent',sub:'Post-ship edits',pipeline:'web',color:'#22d3ee',phase:9,
-    desc='Handles post-delivery change requests. Classifies: visual, schema, logic, feature, bug fix, config. Surgical change plan → APPROVE → execute.',
+  'change-web': {id:'change-web',label:'Change Agent',sub:'Post-ship edits',pipeline:'web',color:'#22d3ee',phase:9,
+    desc:'Handles post-delivery change requests. Classifies: visual, schema, logic, feature, bug fix, config. Surgical change plan → APPROVE → execute.',
     conns:[
       {target:'coders-web',type:'output',label:'Change → Coder'},
       {target:'orch-web',type:'report',label:'Change plan → APPROVE'}
     ]},
 
   // ── Flutter SDLC Orchestrator ──
-  'orch-flutter': {id:'orch-flutter',label:'Orchestrator\\n(Flutter)',sub:'10-agent pipeline',pipeline:'flutter',color:'#7c6cf0',phase:0,
+  'orch-flutter': {id:'orch-flutter',label:'Orchestrator (Flutter)',sub:'10-agent pipeline',pipeline:'flutter',color:'#7c6cf0',phase:0,
     desc:'State machine for Flutter mobile projects. IDEA → PRD → ARCH → TICKETS → CODE → REVIEW → TEST → BUILD. One action per invocation, always JSON output. Never dispatches two agents simultaneously.',
     conns:[
       {target:'prd-flutter',type:'dispatch',label:'IDEA: PRD'},
@@ -503,42 +503,42 @@ const agents = {
       {target:'test-flutter',type:'dispatch',label:'CODE✓: Tests'},
       {target:'build-flutter',type:'dispatch',label:'TEST✓: Build'}
     ]},
-  'prd-flutter': {id:'prd-flutter',label:'PRD\\nAgent',sub:'Requirements',pipeline:'flutter',color:'#4ade80',phase:1,
+  'prd-flutter': {id:'prd-flutter',label:'PRD Agent',sub:'Requirements',pipeline:'flutter',color:'#4ade80',phase:1,
     desc:'Captures Flutter app requirements: screens, features, user flows, entities, integrations, design references.',
     conns:[
       {target:'arch-flutter',type:'output',label:'PRD → Architect'},
       {target:'orch-flutter',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'arch-flutter': {id:'arch-flutter',label:'Architect\\n(Flutter)',sub:'Flutter Stack',pipeline:'flutter',color:'#4ade80',phase:2,
-    desc='Decides Flutter architecture: state management (Provider/Riverpod/Bloc), navigation (go_router), folder structure, packages, theming.',
+  'arch-flutter': {id:'arch-flutter',label:'Architect (Flutter)',sub:'Flutter Stack',pipeline:'flutter',color:'#4ade80',phase:2,
+    desc:'Decides Flutter architecture: state management (Provider/Riverpod/Bloc), navigation (go_router), folder structure, packages, theming.',
     conns:[
       {target:'ticket-flutter',type:'output',label:'Arch → Tickets'},
       {target:'orch-flutter',type:'report',label:'Checkpoint: APPROVE'}
     ]},
-  'ticket-flutter': {id:'ticket-flutter',label:'Ticket\\nAgent',sub:'Task Breakdown',pipeline:'flutter',color:'#4ade80',phase:3,
-    desc='Generates sequenced tickets from architecture. Each ticket maps to one file/widget with dependency ordering.',
+  'ticket-flutter': {id:'ticket-flutter',label:'Ticket Agent',sub:'Task Breakdown',pipeline:'flutter',color:'#4ade80',phase:3,
+    desc:'Generates sequenced tickets from architecture. Each ticket maps to one file/widget with dependency ordering.',
     conns:[
       {target:'coders-flutter',type:'output',label:'Tickets → Code/Review'}
     ]},
-  'coders-flutter': {id:'coders-flutter',label:'Coder\\nAgent',sub:'Flutter Code',pipeline:'flutter',color:'#4ade80',phase:4,
+  'coders-flutter': {id:'coders-flutter',label:'Coder Agent',sub:'Flutter Code',pipeline:'flutter',color:'#4ade80',phase:4,
     desc:'Writes Flutter/Dart code per ticket. Models, screens, widgets, services, state management. Checks existing files first. Validates with flutter analyze.',
     conns:[
       {target:'review-flutter',type:'review',label:'Code → Review (pink)'},
       {target:'orch-flutter',type:'report',label:'PASS / FAIL'}
     ]},
-  'review-flutter': {id:'review-flutter',label:'Review\\nAgent',sub:'Code Quality',pipeline:'flutter',color:'#e879f9',phase:5,
+  'review-flutter': {id:'review-flutter',label:'Review Agent',sub:'Code Quality',pipeline:'flutter',color:'#e879f9',phase:5,
     desc:'Reviews Flutter code: no analyzer errors, state management patterns, null safety, dependency injection, test compatibility.',
     conns:[
       {target:'coders-flutter',type:'feedback',label:'FAIL → Retry'},
       {target:'orch-flutter',type:'report',label:'PASS / FAIL'}
     ]},
-  'test-flutter': {id:'test-flutter',label:'Test\\nAgent',sub:'Flutter Tests',pipeline:'flutter',color:'#4ade80',phase:6,
+  'test-flutter': {id:'test-flutter',label:'Test Agent',sub:'Flutter Tests',pipeline:'flutter',color:'#4ade80',phase:6,
     desc:'Generates widget tests and unit tests. Provider mocking, SharedPreferences setup. All must pass before BUILD.',
     conns:[
       {target:'build-flutter',type:'output',label:'Tests → Build'},
       {target:'orch-flutter',type:'report',label:'All passed'}
     ]},
-  'build-flutter': {id:'build-flutter',label:'Build\\nAgent',sub:'APK + Release',pipeline:'flutter',color:'#4ade80',phase:7,
+  'build-flutter': {id:'build-flutter',label:'Build Agent',sub:'APK + Release',pipeline:'flutter',color:'#4ade80',phase:7,
     desc:'Builds release APK, creates GitHub release with APK attachment and git tag. Full SDLC mandate: Review → Test → Build → Release.',
     conns:[
       {target:'github-shared',type:'release',label:'GitHub Release'},
@@ -546,7 +546,7 @@ const agents = {
     ]},
 
   // ── Trading / Market Analysis ──
-  'trading': {id:'trading',label:'hime-\\ntrader-joe',sub:'Market Analysis',pipeline:'trading',color:'#fb923c',phase:0,
+  'trading': {id:'trading',label:'hime- trader-joe',sub:'Market Analysis',pipeline:'trading',color:'#fb923c',phase:0,
     desc:'Trading & market analysis agent. Analyzes markets, detects trends, monitors news, executes orders via Alpaca API, manages positions with circuit breaker protection, stale exit management, and trade journaling. Discord bot on #trading channel.',
     conns:[
       {target:'github-shared',type:'push',label:'Trade logs'},
@@ -657,7 +657,7 @@ function renderGraph(){
     if(focusedNode===id) rect.setAttribute('filter','url(#glow)');
     g.appendChild(rect);
 
-    const lines = agent.label.split('\n');
+    const lines = agent.label.split(' ');
     const cy = pos.y + pos.h/2 - ((lines.length-1)*7);
     for(let i=0;i<lines.length;i++){
       const t = document.createElementNS('http://www.w3.org/2000/svg','text');
@@ -686,7 +686,7 @@ function showDetail(id){
   if(!a) return;
   focusedNode = id;
   renderGraph();
-  document.getElementById('dpTitle').textContent = a.label.replace('\n',' ');
+  document.getElementById('dpTitle').textContent = a.label.replace(' ',' ');
   const tag = document.getElementById('dpTag');
   const pipelineLabels = {web:'Web SDLC',flutter:'Flutter SDLC',trading:'Trading / Market',core:'Core / Shared'};
   tag.textContent = pipelineLabels[a.pipeline] || a.pipeline;
@@ -700,7 +700,7 @@ function showDetail(id){
     const t = agents[c.target];
     if(!t) continue;
     const li = document.createElement('li');
-    li.innerHTML = `<span class="conn-dot" style="background:${t.color}"></span><span>${t.label.replace('\n',' ')}</span><span class="conn-type">${c.type}</span>`;
+    li.innerHTML = `<span class="conn-dot" style="background:${t.color}"></span><span>${t.label.replace(' ',' ')}</span><span class="conn-type">${c.type}</span>`;
     li.onclick = ()=>{ showDetail(c.target); };
     connUl.appendChild(li);
   }
